@@ -5,6 +5,7 @@ from pathlib import Path
 import joblib
 import pandas
 from dotenv import load_dotenv
+from pandas import DataFrame
 from sklearn.compose import ColumnTransformer
 from sklearn.metrics import accuracy_score
 from sklearn.model_selection import train_test_split, GridSearchCV
@@ -62,18 +63,22 @@ def train():
     param_grid = {}
     transformers = []
     for col in numeric_cols:
+        if col == "age":
+            transformers.append((col, "drop", [col]))
+            continue
         transformers.append((col, StandardScaler(), [col]))
     for col in categorical_cols:
+        if col == "parent_education":
+            transformers.append((col, "drop", [col]))
+            continue
         transformers.append((col, OneHotEncoder(), [col]))
     for col in binary_cols:
         transformers.append((col, OrdinalEncoder(categories=[binary_cols[col]]), [col]))
     preprocessor = ColumnTransformer(transformers=transformers)
-    param_grid["classifier__n_neighbors"] = [2 * i + 1 for i in range(1, 11)]
-    param_grid["classifier__weights"] = ["uniform", "distance"]
-    param_grid["classifier__metric"] = ["euclidean", "manhattan"]
+    param_grid["classifier__n_neighbors"] = [211 + 2 * i for i in range(-15, 16)]
     pipeline = Pipeline(steps=[
         ("preprocessor", preprocessor),
-        ("classifier", KNeighborsClassifier(n_jobs=-2))
+        ("classifier", KNeighborsClassifier(n_jobs=-2, weights="distance", metric="euclidean"))
     ])
     x_train, x_test, y_train, y_test = train_test_split(x, y, random_state=1, test_size=0.2)
     grid = GridSearchCV(
@@ -98,9 +103,12 @@ def train():
     print(f"Hoàn tất huấn luyện mô hình KNN trong {datetime.datetime.now() - start}")
 
 
-def predict(data):
-    print("Trả ra giá trị dự đoán ở hàm này")
-    pass
+def predict_knn(data):
+    pipeline = joblib.load(SAVE_PATH.joinpath(MODEL_FILE_NAME))
+    encoder = joblib.load(SAVE_PATH.joinpath(ENCODER_FILE_NAME))
+    input_df = DataFrame([data])
+    result = encoder.inverse_transform(pipeline.predict(input_df))[0]
+    return result
 
 
 if __name__ == "__main__":
