@@ -27,7 +27,7 @@ def train():
     print(f"Bắt đầu quá trình huấn luyện mô hình Ridge Regression lúc {start}")
     
     print("Đang đọc dữ liệu...")
-    data = pandas.read_csv(DATA_PATH)
+    data = pandas.read_csv(DATA_PATH, keep_default_na=False)
     
     # Tách X và y. Bài toán Regression dự đoán final_grade
     y = data["final_grade"]

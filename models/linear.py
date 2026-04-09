@@ -26,7 +26,7 @@ def train():
     start = datetime.datetime.now()
     print(f"Bắt đầu quá trình huấn luyện mô hình Linear Regression lúc {start}")
     print("Đang đọc dữ liệu...")
-    data = pandas.read_csv(DATA_PATH)
+    data = pandas.read_csv(DATA_PATH, keep_default_na=False)
     y = data["final_grade"]
     x = data.drop(["student_id", "pass_fail", "grade_category", "final_grade"], axis=1)
     numeric_cols = [

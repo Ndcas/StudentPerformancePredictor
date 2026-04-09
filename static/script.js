@@ -1,1 +1,0 @@
-document.getElementById("title").textContent = "Chưa viết";
