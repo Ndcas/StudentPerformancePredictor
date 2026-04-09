@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import Any
 
 import joblib
 import numpy as np
@@ -17,7 +18,7 @@ def train() -> Pipeline:
     model_dir = project_root / "pretrained"
     model_path = model_dir / "linearsvr_model.pkl"
 
-    df = pd.read_csv(data_path)
+    df = pd.read_csv(data_path, keep_default_na=False)
     df = df.drop(columns=["student_id", "grade_category", "pass_fail"])
 
     y = df["final_grade"]
@@ -67,6 +68,21 @@ def train() -> Pipeline:
     print(f"Saved model to: {model_path}")
 
     return pipeline
+
+
+def predict(data: Any):
+    project_root = Path(__file__).resolve().parents[1]
+    model_path = project_root / "pretrained" / "linearsvr_model.pkl"
+    pipeline = joblib.load(model_path)
+
+    if isinstance(data, pd.DataFrame):
+        input_df = data
+    elif isinstance(data, list):
+        input_df = pd.DataFrame(data)
+    else:
+        input_df = pd.DataFrame([data])
+
+    return pipeline.predict(input_df)
 
 
 if __name__ == "__main__":
