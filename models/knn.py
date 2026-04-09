@@ -23,12 +23,14 @@ CPU_THREADS = int(os.getenv("CPU_THREADS"))
 MODEL_FILE_NAME = "knn.pkl"
 ENCODER_FILE_NAME = "knn_encoder.pkl"
 
+pipeline = None
+encoder = None
 
 def train():
     start = datetime.datetime.now()
     print(f"Bắt đầu quá trình huấn luyện mô hình KNN lúc {start}")
     print("Đang đọc dữ liệu...")
-    data = pandas.read_csv(DATA_PATH)
+    data = pandas.read_csv(DATA_PATH, keep_default_na=False)
     data = data.drop(["student_id", "final_grade", "grade_category"], axis=1)
     x = data.drop("pass_fail", axis=1)
     label_encoder = LabelEncoder()
@@ -104,8 +106,12 @@ def train():
 
 
 def predict_knn(data):
-    pipeline = joblib.load(SAVE_PATH.joinpath(MODEL_FILE_NAME))
-    encoder = joblib.load(SAVE_PATH.joinpath(ENCODER_FILE_NAME))
+    global pipeline
+    global encoder
+    if pipeline is None:
+        pipeline = joblib.load(SAVE_PATH.joinpath(MODEL_FILE_NAME))
+    if encoder is None:
+        encoder = joblib.load(SAVE_PATH.joinpath(ENCODER_FILE_NAME))
     input_df = DataFrame([data])
     result = encoder.inverse_transform(pipeline.predict(input_df))[0]
     return result

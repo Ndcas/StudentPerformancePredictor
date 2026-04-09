@@ -5,12 +5,286 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dự đoán thành tích học sinh</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css' ) }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='lib/bootstrap-5.3.8/css/bootstrap.min.css') }}">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+        }
+
+        #bg-image {
+            background-image: url("{{ url_for('static', filename='images/dataset-cover.png') }}");
+            background-size: cover;
+            height: 100vh;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+        }
+
+        .blur-bg {
+            background-color: rgba(255, 255, 255, 0.4);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+        }
+
+        .premium-title {
+            background: linear-gradient(135deg, #0d6efd 0%, #6610f2 100%);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            line-height: 1.4;
+            padding-bottom: 5px;
+        }
+    </style>
 </head>
 
-<body>
-    <h1 id="title">Dự đoán thành tích học sinh</h1>
-    <script src="{{ url_for('static', filename='script.js' ) }}"></script>
+<body id="bg-image" class="d-flex align-items-center min-vh-100 py-3">
+    <div class="blur-bg container shadow-lg p-2">
+        <h2 class="text-center mb-4 premium-title">Hệ Thống Dự Đoán Thành Tích Học Tập</h2>
+        <form action="#" id="data-form" method="post" class="container">
+            <div class="row mb-3">
+                <div class="col">
+                    <label for="age" class="form-label fw-bold">Tuổi:</label>
+                    <input type="number" name="age" id="age" min="15" max="21" value="18" required class="form-control">
+                </div>
+                <div class="col">
+                    <label for="gender" class="form-label fw-bold">Giới tính:</label>
+                    <select name="gender" id="gender" required class="form-select">
+                        <option value="Female" selected>Nữ</option>
+                        <option value="Male">Nam</option>
+                        <option value="Other">Khác</option>
+                    </select>
+                </div>
+                <div class="col">
+                    <label for="study_hours" class="form-label fw-bold">Số giờ học hằng ngày:</label>
+                    <input type="number" name="study_hours" id="study_hours" min="0" max="12" step="0.01" value="4.5"
+                        required class="form-control">
+                </div>
+                <div class="col">
+                    <label for="attendance" class="form-label fw-bold">Tỉ lệ đi học (%):</label>
+                    <input type="number" name="attendance" id="attendance" min="40" max="100" step="0.01" value="84.7"
+                        required class="form-control">
+                </div>
+                <div class="col">
+                    <label for="sleep_hours" class="form-label fw-bold">Số giờ ngủ hằng ngày:</label>
+                    <input type="number" name="sleep_hours" id="sleep_hours" min="3" max="10" step="0.01" value="6.99"
+                        required class="form-control">
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col">
+                    <label for="previous_grade" class="form-label fw-bold">Điểm lớp trước:</label>
+                    <input type="number" name="previous_grade" id="previous_grade" min="20" max="100" step="0.01"
+                        value="69.8" required class="form-control">
+                </div>
+                <div class="col">
+                    <label for="assignments_completed" class="form-label fw-bold">Số bài tập đã hoàn thành:</label>
+                    <input type="number" name="assignments_completed" id="assignments_completed" min="0" max="10"
+                        value="7.84" step="0.01" required class="form-control">
+                </div>
+                <div class="col">
+                    <label for="practice_tests_taken" class="form-label fw-bold">Số bài kiểm tra đã làm:</label>
+                    <input type="number" name="practice_tests_taken" id="practice_tests_taken" min="0" max="10"
+                        value="4.02" step="0.01" required class="form-control">
+                </div>
+                <div class="col">
+                    <label for="group_study_hours" class="form-label fw-bold">Số giờ học nhóm:</label>
+                    <input type="number" name="group_study_hours" id="group_study_hours" min="0" max="6" step="0.01"
+                        value="1.53" required class="form-control">
+                </div>
+                <div class="col">
+                    <label for="notes_quality_score" class="form-label fw-bold">Chất lượng ghi chú:</label>
+                    <input type="number" name="notes_quality_score" id="notes_quality_score" min="1" max="10"
+                        value="6.95" step="0.01" required class="form-control">
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col">
+                    <label for="time_management_score" class="form-label fw-bold">Khả năng quản lý thời gian:</label>
+                    <input type="number" name="time_management_score" id="time_management_score" min="1" max="10"
+                        value="6.46" step="0.01" required class="form-control">
+                </div>
+                <div class="col">
+                    <label for="motivation_level" class="form-label fw-bold">Mức độ động lực:</label>
+                    <input type="number" name="motivation_level" id="motivation_level" min="1" max="10" step="0.01"
+                        value="6.95" required class="form-control">
+                </div>
+                <div class="col">
+                    <label for="mental_health_score" class="form-label fw-bold">Sức khỏe tinh thần:</label>
+                    <input type="number" name="mental_health_score" id="mental_health_score" min="1" max="10"
+                        value="6.98" step="0.01" required class="form-control">
+                </div>
+                <div class="col">
+                    <label for="screen_time" class="form-label fw-bold">Số giờ xem màn hình:</label>
+                    <input type="number" name="screen_time" id="screen_time" min="0" max="12" step="0.01" value="4.02"
+                        required class="form-control">
+                </div>
+                <div class="col">
+                    <label for="social_media_hours" class="form-label fw-bold">Số giờ dùng mạng xã hội:</label>
+                    <input type="number" name="social_media_hours" id="social_media_hours" min="0" max="8" step="0.01"
+                        value="2.53" required class="form-control">
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col">
+                    <label for="family_income" class="form-label fw-bold">Thu nhập gia đình:</label>
+                    <select name="family_income" id="family_income" required class="form-select">
+                        <option value="Low">Thấp</option>
+                        <option value="Medium" selected>Trung bình</option>
+                        <option value="High">Cao</option>
+                    </select>
+                </div>
+                <div class="col">
+                    <label for="parent_education" class="form-label fw-bold">Học vấn cao nhất của cha mẹ:</label>
+                    <select name="parent_education" id="parent_education" required class="form-select">
+                        <option value="High School" selected>Trung học</option>
+                        <option value="Bachelor">Đại học</option>
+                        <option value="Master">Thạc sĩ</option>
+                        <option value="PhD">Tiến sĩ</option>
+                    </select>
+                </div>
+                <div class="col">
+                    <label for="internet_access" class="form-label fw-bold">Truy cập Internet:</label>
+                    <select name="internet_access" id="internet_access" required class="form-select">
+                        <option value="Yes" selected>Có</option>
+                        <option value="No">Không</option>
+                    </select>
+                </div>
+                <div class="col">
+                    <label for="device_type" class="form-label fw-bold">Thiết bị sử dụng để học:</label>
+                    <select name="device_type" id="device_type" required class="form-select">
+                        <option value="Mobile">Điện thoại</option>
+                        <option value="Laptop" selected>Laptop</option>
+                        <option value="Tablet">Máy tính bảng</option>
+                        <option value="None">Không có</option>
+                    </select>
+                </div>
+                <div class="col">
+                    <label for="school_type" class="form-label fw-bold">Loại trường:</label>
+                    <select name="school_type" id="school_type" required class="form-select">
+                        <option value="Public" selected>Công lập</option>
+                        <option value="Private">Tư thục</option>
+                    </select>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col">
+                    <label for="extracurriculars" class="form-label fw-bold">Hoạt động ngoại khóa:</label>
+                    <select name="extracurriculars" id="extracurriculars" required class="form-select">
+                        <option value="Arts" selected>Nghệ thuật</option>
+                        <option value="Coding Club">Câu lạc bộ lập trình</option>
+                        <option value="Music">Âm nhạc</option>
+                        <option value="Sports">Thể thao</option>
+                        <option value="Debate">Tranh luận</option>
+                        <option value="None">Không tham gia</option>
+                    </select>
+                </div>
+                <div class="col"></div>
+                <div class="col"></div>
+                <div class="col"></div>
+                <div class="col"></div>
+            </div>
+            <div class="row mb-3 d-flex justify-content-center align-items-center">
+                <button id="submit-button" type="submit" class="btn btn-primary w-auto fw-bold">Dự đoán</button>
+            </div>
+        </form>
+        <div id="result" style="display: none;">
+            <div class="row">
+                <div class="col border-end border-secondary">
+                    <div class="row mb-3">
+                        <div id="classification-general" class="col fw-bold text-center"></div>
+                    </div>
+                    <div id="classification-models" class="row mb-3"></div>
+                    <div id="classification-values" class="row mb-3"></div>
+                </div>
+                <div class="col">
+                    <div class="row mb-3">
+                        <div id="regression-general" class="col fw-bold text-center"></div>
+                    </div>
+                    <div id="regression-models" class="row mb-3"></div>
+                    <div id="regression-values" class="row mb-3"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="{{ url_for('static', filename='lib/bootstrap-5.3.8/js/bootstrap.min.js' ) }}"></script>
+    <script>
+        const form = document.getElementById("data-form");
+        const submitButtn = document.getElementById("submit-button");
+        const resultPanel = document.getElementById("result");
+        const classificationGeneral = document.getElementById("classification-general");
+        const classificationModels = document.getElementById("classification-models");
+        const classificationValues = document.getElementById("classification-values");
+        const regressionGeneral = document.getElementById("regression-general");
+        const regressionModels = document.getElementById("regression-models");
+        const regressionValues = document.getElementById("regression-values");
+
+        form.addEventListener("submit", async (e) => {
+            e.preventDefault();
+            submitButtn.disabled = true;
+            submitButtn.innerHTML = "Đang xử lý...";
+            resultPanel.style.display = "none";
+            let formData = new FormData(form);
+            let response = await fetch("/predict", {
+                method: "POST",
+                body: formData
+            });
+            if (!response.ok) {
+                alert("Xuất hiện lỗi");
+                submitButtn.disabled = false;
+                submitButtn.innerHTML = "Dự đoán";
+                return;
+            }
+            let data = await response.json();
+            classificationModels.innerHTML = "";
+            classificationValues.innerHTML = "";
+            regressionModels.innerHTML = "";
+            regressionValues.innerHTML = "";
+            classificationGeneral.innerHTML = `
+                Phân lớp: <span class="badge ${data.classification.general === 'Pass' ? 'bg-success' : 'bg-danger'} fs-5">${data.classification.general}</span>
+            `;
+            regressionGeneral.innerHTML = `
+                Hồi quy: <span class="badge ${parseFloat(data.regression.general) >= 50 ? 'bg-success' : 'bg-danger'} fs-5">${data.regression.general}</span>
+            `;
+            let classificationModelNames = Object.keys(data.classification.details);
+            let regressionModelNames = Object.keys(data.regression.details);
+            let classificationCount = classificationModelNames.length;
+            let regressionCount = regressionModelNames.length;
+            classificationModelNames.forEach((key, index) => {
+                classificationModels.innerHTML += `
+                    <div class="col fw-bold text-center ${index < classificationCount - 1 ? 'border-end border-secondary' : ''}">
+                        ${key}
+                    </div>
+                `;
+                classificationValues.innerHTML += `
+                    <div class="col fw-bold text-center ${data.classification.details[key] === 'Pass' ? 'text-success' : 'text-danger'} ${index < classificationCount - 1 ? 'border-end border-secondary' : ''}">
+                        ${data.classification.details[key]}
+                    </div>
+                `;
+            });
+            regressionModelNames.forEach((key, index) => {
+                regressionModels.innerHTML += `
+                    <div class="col fw-bold text-center ${index < regressionCount - 1 ? 'border-end border-secondary' : ''}">
+                        ${key}
+                    </div>
+                `;
+                regressionValues.innerHTML += `
+                    <div class="col fw-bold text-center ${parseFloat(data.regression.details[key]) >= 50 ? 'text-success' : 'text-danger'} ${index < regressionCount - 1 ? 'border-end border-secondary' : ''}">
+                        ${data.regression.details[key]}
+                    </div>
+                `;
+            });
+            submitButtn.disabled = false;
+            submitButtn.innerHTML = "Dự đoán";
+            resultPanel.style.display = "block";
+        });
+    </script>
 </body>
 
 </html>
