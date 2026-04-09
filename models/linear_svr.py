@@ -56,10 +56,12 @@ def train() -> Pipeline:
 
     y_pred = pipeline.predict(X_test)
     mae = mean_absolute_error(y_test, y_pred)
-    rmse = np.sqrt(mean_squared_error(y_test, y_pred))
+    mse = mean_squared_error(y_test, y_pred)
+    rmse = np.sqrt(mse)
     r2 = r2_score(y_test, y_pred)
 
     print(f"MAE: {mae:.4f}")
+    print(f"MSE: {mse:.4f}")
     print(f"RMSE: {rmse:.4f}")
     print(f"R-squared: {r2:.4f}")
 
