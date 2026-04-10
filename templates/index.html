@@ -191,7 +191,8 @@
                 <div class="col"></div>
             </div>
             <div class="row mb-3 d-flex justify-content-center align-items-center">
-                <button id="submit-button" type="submit" class="btn btn-primary w-auto fw-bold">Dự đoán</button>
+                <button id="submit-button" type="submit" class="btn btn-primary w-auto fw-bold shadow-lg">Dự
+                    đoán</button>
             </div>
         </form>
         <div id="result" style="display: none;">
@@ -247,10 +248,10 @@
             regressionModels.innerHTML = "";
             regressionValues.innerHTML = "";
             classificationGeneral.innerHTML = `
-                Phân lớp: <span class="badge ${data.classification.general === 'Pass' ? 'bg-success' : 'bg-danger'} fs-5">${data.classification.general}</span>
+                Phân lớp: <span class="badge text-${data.classification.general === 'Pass' ? 'bg-success' : 'bg-danger'} fs-5">${data.classification.general}</span>
             `;
             regressionGeneral.innerHTML = `
-                Hồi quy: <span class="badge ${parseFloat(data.regression.general) >= 50 ? 'bg-success' : 'bg-danger'} fs-5">${data.regression.general}</span>
+                Hồi quy: <span class="badge text-${parseFloat(data.regression.general) >= 50 ? 'bg-success' : 'bg-danger'} fs-5">${data.regression.general}</span>
             `;
             let classificationModelNames = Object.keys(data.classification.details);
             let regressionModelNames = Object.keys(data.regression.details);
