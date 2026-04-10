@@ -5,6 +5,7 @@ from pathlib import Path
 import joblib
 import pandas
 from dotenv import load_dotenv
+from pandas import DataFrame
 from sklearn.compose import ColumnTransformer
 from sklearn.metrics import accuracy_score
 from sklearn.model_selection import train_test_split, GridSearchCV
@@ -28,7 +29,7 @@ def train():
     start = datetime.datetime.now()
     print(f"Bắt đầu huấn luyện Decision Tree lúc {start}")
 
-    data = pandas.read_csv(DATA_PATH)
+    data = pandas.read_csv(DATA_PATH, keep_default_na=False)
     data = data.drop(["student_id", "final_grade", "grade_category"], axis=1)
 
     x = data.drop("pass_fail", axis=1)
@@ -80,7 +81,7 @@ def train():
     }
 
     x_train, x_test, y_train, y_test = train_test_split(
-        x, y, test_size=0.2, random_state=1, stratify=y
+        x, y, test_size=0.2, random_state=42, stratify=y
     )
 
     grid = GridSearchCV(
@@ -116,8 +117,10 @@ def predict(data):
     model = joblib.load(SAVE_PATH / MODEL_FILE_NAME)
     encoder = joblib.load(SAVE_PATH / ENCODER_FILE_NAME)
 
-    y_pred = model.predict(data)
-    return encoder.inverse_transform(y_pred)
+    input_df = DataFrame([data])
+
+    y_pred = model.predict(input_df)
+    return encoder.inverse_transform(y_pred)[0]
 
 
 if __name__ == "__main__":

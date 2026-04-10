@@ -4,6 +4,7 @@ from pathlib import Path
 
 import joblib
 import pandas
+from pandas import DataFrame
 from dotenv import load_dotenv
 from sklearn.compose import ColumnTransformer
 from sklearn.metrics import accuracy_score, precision_score, recall_score
@@ -119,8 +120,10 @@ def predict(data):
     model = joblib.load(SAVE_PATH / MODEL_FILE_NAME)
     encoder = joblib.load(SAVE_PATH / ENCODER_FILE_NAME)
 
+    input_df = DataFrame([data])
+
     y_pred = model.predict(data)
-    return encoder.inverse_transform(y_pred)
+    return encoder.inverse_transform(y_pred)[0]
 
 
 if __name__ == "__main__":
