@@ -4,8 +4,12 @@ import numpy
 from dotenv import load_dotenv
 from flask import Flask, render_template, request
 from models.bayesian import predict_bayesian
+from models.dt import predict as predict_dt
 from models.knn import predict_knn
+from models.lasso_regression import predict as predict_lasso
+from models.linear_svr import predict as predict_linear_svr
 from models.linear import predict_linear
+from models.rf import predict as predict_rf
 from models.ridge import predict_ridge
 
 load_dotenv()
@@ -58,13 +62,17 @@ def predict():
         "classification": {
             "details": {
                 "Naive Bayesian": predict_bayesian(data),
-                "KNN": predict_knn(data)
+                "KNN": predict_knn(data),
+                "Decision Tree": predict_dt(data),
+                "Random Forest": predict_rf(data)
             }
         },
         "regression": {
             "details": {
                 "Linear Regression": round(float(predict_linear(data)), 2),
-                "Ridge Regression": round(float(predict_ridge(data)), 2)
+                "Ridge Regression": round(float(predict_ridge(data)), 2),
+                "Lasso Regression": round(float(predict_lasso(data)), 2),
+                "Linear SVR": round(float(predict_linear_svr(data)), 2)
             }
         }
     }
