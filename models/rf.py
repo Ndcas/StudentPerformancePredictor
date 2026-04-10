@@ -122,7 +122,7 @@ def predict(data):
 
     input_df = DataFrame([data])
 
-    y_pred = model.predict(data)
+    y_pred = model.predict(input_df)
     return encoder.inverse_transform(y_pred)[0]
 
 
