@@ -84,7 +84,7 @@ def predict(data: Any):
     else:
         input_df = pd.DataFrame([data])
 
-    return pipeline.predict(input_df)
+    return pipeline.predict(input_df)[0]
 
 
 if __name__ == "__main__":
