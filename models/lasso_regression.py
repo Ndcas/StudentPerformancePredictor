@@ -11,7 +11,6 @@ from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 
-
 def train() -> Pipeline:
     project_root = Path(__file__).resolve().parents[1]
     data_path = project_root / "data" / "student_performance_prediction_dataset-2.csv"
@@ -41,7 +40,18 @@ def train() -> Pipeline:
     pipeline = Pipeline(
         steps=[
             ("preprocessor", preprocessor),
-            ("model", Lasso()),
+            (
+                "model",
+                Lasso(
+                    alpha=1.0,
+                    fit_intercept=True,
+                    max_iter=10000,
+                    tol=1e-4,
+                    selection="cyclic",
+                    positive=False,
+                    random_state=42,
+                ),
+            ),
         ]
     )
 
@@ -57,6 +67,21 @@ def train() -> Pipeline:
     print(f"MSE: {mse:.4f}")
     print(f"RMSE: {rmse:.4f}")
     print(f"R-squared: {r2:.4f}")
+
+    feature_names = pipeline.named_steps["preprocessor"].get_feature_names_out()
+    coefficients = pipeline.named_steps["model"].coef_
+    zero_feature_names = [
+        feature_names[idx]
+        for idx, coef in enumerate(coefficients)
+        if np.isclose(coef, 0.0)
+    ]
+
+    print("Zero-coefficient features:")
+    if zero_feature_names:
+        for feature_name in zero_feature_names:
+            print(f"- {feature_name}")
+    else:
+        print("- None")
 
     model_dir.mkdir(parents=True, exist_ok=True)
     joblib.dump(pipeline, model_path)

@@ -11,7 +11,6 @@ from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 from sklearn.svm import LinearSVR
 
-
 def train() -> Pipeline:
     project_root = Path(__file__).resolve().parents[1]
     data_path = project_root / "data" / "student_performance_prediction_dataset-2.csv"
@@ -44,9 +43,14 @@ def train() -> Pipeline:
             (
                 "model",
                 LinearSVR(
+                    C=1.0,
+                    epsilon=0.0,
+                    tol=1e-4,
+                    max_iter=10000,
+                    fit_intercept=True,
+                    loss="squared_epsilon_insensitive",
                     dual=False,
                     random_state=42,
-                    loss="squared_epsilon_insensitive",
                 ),
             ),
         ]
