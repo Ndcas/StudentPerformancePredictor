@@ -1,15 +1,23 @@
+import os
 from pathlib import Path
 from typing import Any
 
 import joblib
 import numpy as np
 import pandas as pd
+from dotenv import load_dotenv
 from sklearn.compose import ColumnTransformer
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import GridSearchCV, train_test_split
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 from sklearn.svm import LinearSVR
+
+load_dotenv()
+
+K_FOLDS = int(os.getenv("K_FOLDS", 5))
+CPU_THREADS = int(os.getenv("CPU_THREADS", -1))
+
 
 def train() -> Pipeline:
     project_root = Path(__file__).resolve().parents[1]
@@ -56,9 +64,47 @@ def train() -> Pipeline:
         ]
     )
 
-    pipeline.fit(X_train, y_train)
+    param_grid = {
+        "model__C": [0.1, 1.0, 10.0],
+        "model__epsilon": [0.0, 0.5, 1.0],
+    }
 
-    y_pred = pipeline.predict(X_test)
+    grid = GridSearchCV(
+        estimator=pipeline,
+        param_grid=param_grid,
+        scoring={
+            "mse": "neg_mean_squared_error",
+            "mae": "neg_mean_absolute_error",
+            "r2": "r2",
+        },
+        refit="mse",
+        cv=K_FOLDS,
+        n_jobs=CPU_THREADS,
+        verbose=1,
+    )
+
+    grid.fit(X_train, y_train)
+    best_pipeline = grid.best_estimator_
+
+    cv_results = pd.DataFrame(grid.cv_results_)
+    comparison_cols = [
+        "param_model__C",
+        "param_model__epsilon",
+        "mean_test_mae",
+        "mean_test_mse",
+        "mean_test_r2",
+        "rank_test_mse",
+    ]
+    comparison_table = cv_results[comparison_cols].copy()
+    comparison_table["mean_test_mae"] = -comparison_table["mean_test_mae"]
+    comparison_table["mean_test_mse"] = -comparison_table["mean_test_mse"]
+    comparison_table = comparison_table.sort_values("rank_test_mse")
+
+    print("LinearSVR parameter comparison (CV):")
+    print(comparison_table.to_string(index=False))
+    print(f"Best params: {grid.best_params_}")
+
+    y_pred = best_pipeline.predict(X_test)
     mae = mean_absolute_error(y_test, y_pred)
     mse = mean_squared_error(y_test, y_pred)
     rmse = np.sqrt(mse)
@@ -70,10 +116,10 @@ def train() -> Pipeline:
     print(f"R-squared: {r2:.4f}")
 
     model_dir.mkdir(parents=True, exist_ok=True)
-    joblib.dump(pipeline, model_path)
+    joblib.dump(best_pipeline, model_path)
     print(f"Saved model to: {model_path}")
 
-    return pipeline
+    return best_pipeline
 
 
 def predict(data: Any):
