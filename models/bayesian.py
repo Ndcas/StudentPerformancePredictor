@@ -1,5 +1,4 @@
 import datetime
-import math
 import os
 from pathlib import Path
 
@@ -11,7 +10,6 @@ from sklearn.compose import ColumnTransformer
 from sklearn.metrics import accuracy_score
 from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.naive_bayes import GaussianNB
-from sklearn.neighbors import KNeighborsClassifier
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler, OneHotEncoder, OrdinalEncoder, LabelEncoder
 
@@ -80,7 +78,7 @@ def train():
     for col in binary_cols:
         transformers.append((col, OrdinalEncoder(categories=[binary_cols[col]]), [col]))
     preprocessor = ColumnTransformer(transformers=transformers)
-    param_grid["classifier__var_smoothing"] = [10 ** i for i in range(-9, 1)]
+    param_grid["classifier__var_smoothing"] = [10 ** i for i in range (-9, 1)]
     pipeline = Pipeline(steps=[
         ("preprocessor", preprocessor),
         ("classifier", GaussianNB())

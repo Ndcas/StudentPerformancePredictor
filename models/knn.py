@@ -77,7 +77,7 @@ def train():
     for col in binary_cols:
         transformers.append((col, OrdinalEncoder(categories=[binary_cols[col]]), [col]))
     preprocessor = ColumnTransformer(transformers=transformers)
-    param_grid["classifier__n_neighbors"] = [211 + 2 * i for i in range(-15, 16)]
+    param_grid["classifier__n_neighbors"] = [179 + 2 * i for i in range(-15, 16)]
     pipeline = Pipeline(steps=[
         ("preprocessor", preprocessor),
         ("classifier", KNeighborsClassifier(n_jobs=-2, weights="distance", metric="euclidean"))
