@@ -88,7 +88,8 @@ def train():
         pipeline,
         param_grid,
         cv=K_FOLDS,
-        scoring="f1",
+        scoring={"f1": "f1", "accuracy": "accuracy"},
+        refit="f1",
         n_jobs=CPU_THREADS,
         verbose=4
     )
@@ -96,15 +97,28 @@ def train():
     print("Đang huấn luyện Decision Tree...")
     grid.fit(x_train, y_train)
 
-    print("Best params:")
+    print("\n===== Top 10 best combinations =====")
+
+    results = pandas.DataFrame(grid.cv_results_)
+
+    top10 = results.sort_values(by="mean_test_f1", ascending=False).head(10)
+
+    for i in range(len(top10)):
+        print(f"\nRank {i + 1}:")
+        print(f"Params: {top10.iloc[i]['params']}")
+        print(f"F1 (CV): {top10.iloc[i]['mean_test_f1']:.4f}")
+        print(f"Accuracy (CV): {top10.iloc[i]['mean_test_accuracy']:.4f}")
+        print(f"Std F1: {top10.iloc[i]['std_test_f1']:.4f}")
+
+    print("\n===== Best model =====")
     for param in grid.best_params_:
         print(f"{param}: {grid.best_params_[param]}")
 
-    print(f"F1: {grid.best_score_:.4f}")
+    print(f"Best F1 (CV): {grid.best_score_:.4f}")
 
     y_pred = grid.best_estimator_.predict(x_test)
     accuracy = accuracy_score(y_test, y_pred)
-    print(f"Accuracy: {accuracy:.4f}")
+    print(f"Accuracy (test): {accuracy:.4f}")
 
     os.makedirs(SAVE_PATH, exist_ok=True)
     joblib.dump(grid.best_estimator_, SAVE_PATH / MODEL_FILE_NAME)

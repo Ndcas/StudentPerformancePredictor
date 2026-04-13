@@ -29,10 +29,6 @@ def train():
 
     data = pandas.read_csv(DATA_PATH, keep_default_na=False)
 
-    if len(data) > 200000:
-        print("Sampling dữ liệu...")
-        data = data.sample(200000, random_state=1)
-
     data = data.drop(["student_id", "final_grade", "grade_category"], axis=1)
 
     x = data.drop("pass_fail", axis=1)
@@ -91,7 +87,27 @@ def train():
     print("Đang huấn luyện Random Forest...")
     search.fit(x_train, y_train)
 
-    print("Best params:")
+    print("\n===== Kết quả từng iteration =====")
+
+    results = pandas.DataFrame(search.cv_results_)
+
+    for i in range(len(results)):
+        params = results.loc[i, "params"]
+        f1 = results.loc[i, "mean_test_score"]
+
+        # Train lại model với param này để tính accuracy trên test set
+        model = pipeline.set_params(**params)
+        model.fit(x_train, y_train)
+
+        y_pred = model.predict(x_test)
+        acc = accuracy_score(y_test, y_pred)
+
+        print(f"\nIteration {i + 1}:")
+        print(f"Params: {params}")
+        print(f"F1 (CV): {f1:.4f}")
+        print(f"Accuracy (test): {acc:.4f}")
+
+    print("\nBest params:")
     for param in search.best_params_:
         print(f"{param}: {search.best_params_[param]}")
 
